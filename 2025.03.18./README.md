@@ -25,7 +25,7 @@ $("#organization").on("click", ".view_detail", function(e) {
             : img_src
     };
 
-    console.log("✅ 생성된 이미지 URL:", user_info.photo_url);
+    console.log("생성된 이미지 URL:", user_info.photo_url);
 
     let infos = [
         {"key": "소속", "value": formatDisplayGroup(user.group_names, '@@')},
@@ -55,23 +55,23 @@ $(document).on("click", ".portrait img", function(event) {
     event.stopPropagation();
     let imageUrl = $(this).attr("src");
 
-    // ✅ 기본 이미지 클릭 방지
+    // 기본 이미지 클릭 방지
     if (!imageUrl || imageUrl.includes("default_image.jpg") || imageUrl === setThumbImage()) {
         console.warn("기본 이미지가 클릭되었습니다. InAppBrowser를 실행하지 않습니다.");
         return;
     }
 
-    // ✅ URL 유효성 검사
+    // URL 유효성 검사
     if (!imageUrl.startsWith("http")) {
-        console.error("🚨 잘못된 이미지 URL:", imageUrl);
+        console.error("잘못된 이미지 URL:", imageUrl);
         alert("잘못된 이미지 URL입니다.");
         return;
     }
 
-    // ✅ InAppBrowser 실행
+    // InAppBrowser 실행
     let inAppRef = cordova.InAppBrowser.open(imageUrl, '_blank', 'location=no,zoom=yes,toolbar=yes,enableViewportScale=yes');
 
-    // ✅ 닫기 버튼 추가
+    // 닫기 버튼 추가
     inAppRef.addEventListener('loadstop', function() {
         inAppRef.executeScript({
             code: `
@@ -92,7 +92,7 @@ $(document).on("click", ".portrait img", function(event) {
         });
     });
 
-    // ✅ 뒤로 가기 버튼 이벤트 추가 (Android 대응)
+    // 뒤로 가기 버튼 이벤트 추가 (Android 대응)
     inAppRef.addEventListener("backbutton", function() {
         inAppRef.close();
     });
