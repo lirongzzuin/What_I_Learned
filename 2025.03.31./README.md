@@ -25,53 +25,48 @@ $ cordova platform add ios
 
 # 빌드 후 Xcode로 열기
 $ cordova prepare ios
-$ open platforms/ios/App.xcworkspace
+$ open platforms/ios/YourApp.xcworkspace
 ```
 
-### 2. 배포용 `manifest.plist` 구성
-`.ipa` 파일을 직접 배포하기 위해 `itms-services`를 사용. 이에 필요한 `manifest.plist` 파일은 다음과 같이 작성:
+### 2. Xcode에서 `manifest.plist` 포함하여 아카이브
+- Xcode에서 아카이브한 후, **Export > Enterprise > Include manifest for over-the-air installation** 옵션을 선택
+- 이 과정에서 `.ipa`와 함께 배포에 필요한 `manifest.plist` 파일도 자동 생성됨
+- Export 결과 디렉토리 구조 예시:
+  ```
+  └── ExportedApp/
+      ├── App.ipa
+      ├── manifest.plist
+      └── index.html
+  ```
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>items</key>
-  <array>
-    <dict>
-      <key>assets</key>
-      <array>
-        <dict>
-          <key>kind</key>
-          <string>software-package</string>
-          <key>url</key>
-          <string>https://[배포서버]/ios/builds/app-release.ipa</string>
-        </dict>
-      </array>
-      <key>metadata</key>
-      <dict>
-        <key>bundle-identifier</key>
-        <string>com.company.appname</string>
-        <key>bundle-version</key>
-        <string>1.0.0</string>
-        <key>kind</key>
-        <string>software</string>
-        <key>title</key>
-        <string>Company App</string>
-      </dict>
-    </dict>
-  </array>
-</dict>
-</plist>
-```
+### 3. 다운로드 링크 및 HTML 페이지 구성
+- 배포용 서버에 위의 세 파일을 업로드
+- 사용자는 iOS Safari에서 아래와 같은 링크를 통해 앱을 설치 가능
 
-### 3. 다운로드 링크 구성
-사용자가 iOS Safari를 통해 다운로드할 수 있도록 링크를 구성함:
 ```text
 itms-services://?action=download-manifest&url=https://[배포서버]/ios/builds/manifest.plist
 ```
 
-해당 링크는 회사 내부에서 운영하는 배포 서버에 등록되며, 고객사 전용 페이지를 통해 접근 가능하도록 구성.
+- 또는 `index.html`을 통해 다운로드 안내 및 설치 버튼 제공
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>앱 다운로드</title>
+</head>
+<body>
+  <h3>앱 다운로드</h3>
+  <p>iOS에서 Safari로 접속 후 아래 버튼을 클릭하세요.</p>
+  <a href="itms-services://?action=download-manifest&url=https://[배포서버]/ios/builds/manifest.plist">
+    <button>앱 설치</button>
+  </a>
+</body>
+</html>
+```
+
+- 해당 HTML은 고객사 전용 배포 페이지에서 접근 가능하도록 구성
 
 ### 4. 테스트 및 고객사 대응
 - 실제 배포 서버에 업로드 후, iOS 디바이스에서 다운로드 및 설치 테스트 진행
@@ -83,7 +78,8 @@ itms-services://?action=download-manifest&url=https://[배포서버]/ios/builds/
 ## 📌 작업하면서 배운 점
 - iOS의 **엔터프라이즈 배포 인증서는 1년 유효기간**을 가지므로, 사전 점검 및 갱신이 중요함
 - `.plist` 파일의 구성 요소를 이해하고, 올바른 서명과 앱 URL이 배포 성공에 핵심적
-- Xcode와 Cordova 프로젝트 연동을 통해, 빌드/배포 과정에서 유연하게 대응 가능
+- Xcode에서 아카이브 시 **Include manifest** 옵션을 통해 배포에 필요한 모든 파일을 자동으로 구성할 수 있음
+- Cordova 기반 앱이라도 플랫폼 간 빌드와 배포 관리에 유연하게 대응할 수 있도록 프로젝트 구조를 잘 관리하는 것이 중요함
 
 ---
 
@@ -93,3 +89,4 @@ itms-services://?action=download-manifest&url=https://[배포서버]/ios/builds/
 - MDM 솔루션을 활용한 배포 자동화 검토 및 대규모 고객 대응력 강화
 
 ---
+
